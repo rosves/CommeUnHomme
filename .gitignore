@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# VSCode
+.vscode/
+
+# Mac
+.DS_Store
+
+# Coverage
+coverage/
+
+# Optional: lock files
+# package-lock.json
+# yarn.lock
+
+# Misc
+*.tgz
+.idea/
+
+# Ignore compiled JS if you keep TS
+lib/
