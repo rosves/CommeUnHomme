@@ -1,1 +1,3 @@
 export * from './health-check.controller';
+export * from './gym.controller';
+export * from './exercise.controller';

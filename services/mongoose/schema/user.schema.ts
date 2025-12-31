@@ -35,6 +35,5 @@ export function getUserSchema(): Schema<User> {
     }, { 
         collection: "users", 
         versionKey: false 
-    }
-  );
+    });
 }
