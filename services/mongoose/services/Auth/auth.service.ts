@@ -1,8 +1,8 @@
 import { Mongoose } from "mongoose";
-import { UserRole } from "../../../../models";
-import { UserService, CreateUser } from "../user.service";
+import { User, UserRole } from "../../../../models";
+import { UserService } from "../user.service";
 import { TokenService } from "./token.service";
-import { sha256 } from "../../../../utils";
+import { comparePassword } from "../../../../utils";
 
 export interface LoginCredentials {
     login: string;
@@ -29,7 +29,7 @@ export class AuthService {
         this.tokenService = new TokenService();
     }
 
-    async register(userData: CreateUser): Promise<AuthResponse> {
+    async register(userData: User): Promise<AuthResponse> {
         const existingUser = await this.userService.findUser(userData.login);
         if (existingUser) {
             throw new Error('Cet identifiant est déjà utilisé');
@@ -41,7 +41,7 @@ export class AuthService {
 
         return {
             user: {
-                _id: user._id,
+                _id: user._id!.toString(),
                 firstname: user.firstname,
                 lastname: user.lastname,
                 login: user.login,
@@ -60,16 +60,20 @@ export class AuthService {
             throw new Error('Identifiants invalides');
         }
 
-        const hashedPassword = sha256(password);
-        if (user.password !== hashedPassword) {
+        const isPasswordValid = await comparePassword(password, user.password);
+        if (!isPasswordValid) {
             throw new Error('Identifiants invalides');
         }
 
         const token = this.tokenService.generateToken(user);
 
+        if (!user._id) {
+            throw new Error('User ID is missing');
+        }
+
         return {
             user: {
-                _id: user._id,
+                _id: user._id.toString(),
                 firstname: user.firstname,
                 lastname: user.lastname,
                 login: user.login,

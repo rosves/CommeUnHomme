@@ -1,12 +1,8 @@
 import express from 'express';
-import {HealthCheckController, GymController, ExerciseController, UserController} from './controllers';
+import {HealthCheckController, GymController, ExerciseController, UserController, AuthController} from './controllers';
 import {openMongooseConnection} from "./services";
 import {GymService, ExerciseService, UserService} from "./services/mongoose/services";
-import {HealthCheckController, GymController} from './controllers';
-import {openMongooseConnection, UserService} from "./services";
-import {GymService} from "./services/mongoose/services/gym.service";
 import { AuthService } from './services/mongoose/services/Auth';
-import { AuthController } from './controllers';
 import {config} from "dotenv";
 import {UserRole} from "./models";
 
@@ -39,15 +35,12 @@ async function main() {
     const exerciseController = new ExerciseController(exerciseService);
     const userController = new UserController(userService);
 
-    app.use('/health-check', healthCheckController.buildRouter());
-    app.use('/gym', gymController.buildRouter()); 
-    app.use('/exercise', exerciseController.buildRouter());
-    app.use('/user', userController.buildRouter());
-    const gymController = new GymController(gymService);
     const authController = new AuthController(authService); 
 
     app.use('/health-check', healthCheckController.buildRouter());
     app.use('/gym', gymController.buildRouter()); 
+    app.use('/exercise', exerciseController.buildRouter());
+    app.use('/user', userController.buildRouter());
     app.use('/auth', authController.buildRouter());
 
     app.listen(process.env.PORT || 3000, () =>
