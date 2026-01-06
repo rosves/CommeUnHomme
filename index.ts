@@ -2,6 +2,11 @@ import express from 'express';
 import {HealthCheckController, GymController, ExerciseController, UserController} from './controllers';
 import {openMongooseConnection} from "./services";
 import {GymService, ExerciseService, UserService} from "./services/mongoose/services";
+import {HealthCheckController, GymController} from './controllers';
+import {openMongooseConnection, UserService} from "./services";
+import {GymService} from "./services/mongoose/services/gym.service";
+import { AuthService } from './services/mongoose/services/Auth';
+import { AuthController } from './controllers';
 import {config} from "dotenv";
 import {UserRole} from "./models";
 
@@ -12,6 +17,7 @@ async function main() {
     const userService = new UserService(mongooseConnection);
     const gymService = new GymService(mongooseConnection);
     const exerciseService = new ExerciseService(mongooseConnection);
+     const authService = new AuthService(userService);
 
     const adminExists = await userService.findUser('admin');
     if (!adminExists) {
@@ -37,6 +43,12 @@ async function main() {
     app.use('/gym', gymController.buildRouter()); 
     app.use('/exercise', exerciseController.buildRouter());
     app.use('/user', userController.buildRouter());
+    const gymController = new GymController(gymService);
+    const authController = new AuthController(authService); 
+
+    app.use('/health-check', healthCheckController.buildRouter());
+    app.use('/gym', gymController.buildRouter()); 
+    app.use('/auth', authController.buildRouter());
 
     app.listen(process.env.PORT || 3000, () =>
         console.log(`Server listening on port ${process.env.PORT || 3000}!`)
