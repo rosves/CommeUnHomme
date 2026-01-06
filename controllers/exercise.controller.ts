@@ -35,10 +35,11 @@ export class ExerciseController {
 
     buildRouter(): Router {
         const router = Router();
-        router.post('/', this.create.bind(this));         // Créer
-        router.get('/', this.getAll.bind(this));          // Lire tout
-        router.put('/:id', this.update.bind(this));       // MODIFIER (PUT)
-        router.delete('/:id', this.delete.bind(this));    // SUPPRIMER
+        router.post('/', this.create.bind(this));      
+        router.get('/all', this.getAll.bind(this)); 
+        router.get('/:id', this.getAll.bind(this)); 
+        router.put('/:id', this.update.bind(this));    
+        router.delete('/:id', this.delete.bind(this)); 
         return router;
     }
 }
