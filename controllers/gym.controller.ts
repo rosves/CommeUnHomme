@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { GymService } from "../services/mongoose/services/gym.service";
-import { authMiddleware, requireRole } from "../utils/middlewares"; 
+import { authMiddleware, requireRole } from "../utils/middlewares";
+import { UserRole } from "../models/user.interface";
 
 export class GymController {
     constructor(private gymService: GymService) {}
@@ -77,16 +78,17 @@ export class GymController {
 
     buildRouter(): Router {
         const router = Router();
-        
+
+        // Publiques
         router.get('/all', this.getApprovedGyms.bind(this));
         router.get('/:id', this.getById.bind(this));
-
+        // Protégés
         router.post('/', authMiddleware, this.create.bind(this));
         router.put('/:id', authMiddleware, this.update.bind(this));
         router.delete('/:id', authMiddleware, this.delete.bind(this));
-
-        router.get('/admin/all', authMiddleware, this.getAll.bind(this));
-        router.patch('/approve/:id', authMiddleware, this.approve.bind(this));
+        // Admin 
+        router.get('/admin/all', authMiddleware, requireRole(UserRole.ADMIN), this.getAll.bind(this));
+        router.patch('/approve/:id', authMiddleware, requireRole(UserRole.ADMIN), this.approve.bind(this));
        
         
         return router;
