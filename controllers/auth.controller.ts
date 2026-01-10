@@ -68,3 +68,11 @@ export class AuthController {
     return router;
   }
 }
+
+// ajouter le health check
+// rien en clair ni api dans jwt > le prof aime pas le JWT
+// app.use('/auth', authController.buildRouter());
+// salt = avant le mot de passe on ajoute une chaine de caractere pour complexifier le hash
+// l'ordre des index est important sinon le trigger ne fonctionne pas correctement et la recherche doit etre faite dans l'ordre de déclaration
+// Question > expliquer pourquoi "bind(this)"
+// Schéma de session ???
