@@ -21,15 +21,8 @@ export class GymService {
     });
   }
 
-  async addOwner(loginOwner: string) {
-    const ownerToAdd = this.userModel
-      .findOne({ login: loginOwner })
-      .then((docs) => {
-        console.log(docs);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  async changeInformation(ownerToAdd: User, gymName: Gym) {
+    console.log("a continuer");
   }
 
   async approve(gymId: string): Promise<Gym | null> {
@@ -46,6 +39,10 @@ export class GymService {
 
   async findAll(): Promise<Gym[]> {
     return this.gymModel.find();
+  }
+
+  async findByName(gymName: string): Promise<Gym | null> {
+    return this.gymModel.findOne({ name: gymName });
   }
 
   async findById(id: string): Promise<Gym | null> {

@@ -1,10 +1,13 @@
 import { Router, Request, Response } from "express";
-import { GymService } from "../services/mongoose/services/gym.service";
+import { GymService, UserService } from "../services/mongoose/services/";
 import { authMiddleware, requireRole } from "../utils/middlewares";
 import { UserRole } from "../models/user.interface";
 
 export class GymController {
-  constructor(private gymService: GymService) {}
+  constructor(
+    private gymService: GymService,
+    private userService: UserService
+  ) {}
 
   async create(req: Request, res: Response) {
     try {
@@ -19,13 +22,30 @@ export class GymController {
     }
   }
 
-  async addOwner(req: Request, res: Response) {
+  async changeInfo(req: Request, res: Response) {
     try {
-      const ownerToAdd = req.body.user;
-      this.gymService.addOwner(ownerToAdd);
+      const { user, gym } = req.body.user;
+
+      const User = this.userService.findUser(user);
+
+      if (!User) {
+        res.status(400).json({
+          message: "Erreur lors de la récupération de l'utilisateur",
+        });
+      }
+
+      const Gym = this.gymService.findByName(gym);
+
+      if (!Gym) {
+        res.status(400).json({
+          message: "Erreur lors de la récupération de la salle de sport",
+        });
+      }
+
+      res.status(200).send("Propriétaire ajouté");
     } catch (err) {
       res.status(400).json({
-        message: "Erreur lors de l'ajout d'un proproétaire",
+        message: "Erreur lors de l'ajout d'un propriétaire",
         error: err,
       });
     }
@@ -107,10 +127,13 @@ export class GymController {
     router.get("/all", this.getApprovedGyms.bind(this));
     router.get("/:id", this.getById.bind(this));
     // Protégés
-    router.post("/addOwner", authMiddleware, this.create.bind(this));
     router.post("/", authMiddleware, this.create.bind(this));
     router.put("/:id", authMiddleware, this.update.bind(this));
     router.delete("/:id", authMiddleware, this.delete.bind(this));
+
+    // Owner
+    router.post("/changeInfo", authMiddleware, this.changeInfo.bind(this));
+
     // Admin
     router.get(
       "/admin/all",
