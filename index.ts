@@ -46,7 +46,7 @@ async function main() {
   });
 
   const healthCheckController = new HealthCheckController();
-  const gymController = new GymController(gymService);
+  const gymController = new GymController(gymService, userService);
   const exerciseController = new ExerciseController(exerciseService);
   const userController = new UserController(userService);
 
