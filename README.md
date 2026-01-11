@@ -369,6 +369,36 @@ PORT=3000
 npm run dev        # Développement (ts-node-dev avec reload)
 npm run build      # Compiler TypeScript
 npm start          # Production (node dist/index.js)
+npm run data       # Peupler la base avec données de test
+```
+
+### **Peupler la Base de Données**
+
+Pour faciliter les tests, exécutez le script de population qui crée des données pré-configurées:
+
+```bash
+# Option 1 : Exécution directe
+npm run data
+
+# Option 2 : Après compilation
+npm run build && npm run data:build
+```
+
+**Données créées** :
+- ✅ 5 utilisateurs (ADMIN, OWNER, 3 CUSTOMER)
+- ✅ 8 exercices (cardio, musculation, etc.)
+- ✅ 3 salles de sport
+- ✅ 5 badges avec règles dynamiques
+- ✅ 6 récompenses (coaching, réductions, etc.)
+- ✅ 6 défis approuvés + 1 en attente
+
+**Comptes de Test** :
+```
+ADMIN:    admin@fitness.com / admin123
+OWNER:    owner@fitnessgym.com / owner123
+CUSTOMER: jean.dupont@email.com / customer123
+CUSTOMER: marie.martin@email.com / customer123
+CUSTOMER: pierre.bernard@email.com / customer123
 ```
 
 ---
@@ -421,22 +451,136 @@ Body:
 
 ## 📨 Collections Postman
 
-Une collection Postman complète est disponible dans le dossier `/postman`.
+Les collections Postman sont disponibles **en ligne** sur le workspace Postman partagé.
 
-### **Structure Postman**
+### **Accès à la Collection en Ligne**
+
+#### **Option 1 : Via Lien Partagé (Recommandé)**
 ```
-postman/
-├── collections/         # Endpoints groupés
-├── environments/        # Variables (dev, prod)
-└── globals/             # JWT tokens, base URL
-    └── workspace.postman_globals.json
+1. Cliquer sur le lien partagé de la collection Postman
+2. Cliquer sur "Use this template" ou "Fork"
+3. Postman ouvre automatiquement la collection
+4. Configurer l'environnement (voir ci-dessous)
+5. Tester les requêtes directement
 ```
 
-### **Utilisation**
-1. Ouvrir Postman
-2. Importer les collections du dossier `/postman`
-3. Configurer l'environnement (token JWT, user-id)
-4. Exécuter les requêtes
+#### **Option 2 : Via le Workspace Postman**
+```
+1. Aller sur https://www.postman.com
+2. Se connecter à votre compte
+3. Accéder au workspace partagé
+4. Importer/accéder à la collection "Fitness API"
+5. Configurer l'environnement
+```
+
+### **Configuration de l'Environnement**
+
+#### **Étape 1 : Définir les Variables**
+
+En haut à droite dans Postman, sélectionner ou créer un environnement avec :
+
+```json
+{
+  "base_url": "http://localhost:3000",
+  "token": "",
+  "user-id": ""
+}
+```
+
+#### **Étape 2 : Se Connecter (IMPORTANT)**
+
+Avant de tester, il FAUT obtenir un token JWT :
+
+```bash
+Requête POST /login
+Body:
+{
+  "login": "admin@fitness.com",
+  "password": "admin123"
+}
+
+Réponse:
+{
+  "token": "eyJhbGc...",
+  "userId": "507f1f77bcf86cd799439011",
+  ...
+}
+```
+
+**Copier le token et le user-id dans les variables d'environnement** :
+- `token` → le JWT reçu
+- `user-id` → l'userId reçu
+
+### **Workflow Typique**
+
+```
+1. npm run data              → Peupler la BDD
+2. npm run dev              → Lancer le serveur (http://localhost:3000)
+3. Ouvrir Postman en ligne
+4. Accéder à la collection partagée
+5. Configurer base_url = http://localhost:3000
+6. Faire POST /login → copier token et user-id
+7. Tester les routes disponibles
+```
+
+### **Structure des Collections**
+
+Chaque dossier regroupe les endpoints par fonctionnalité :
+
+```
+📁 Auth
+   ├── Register
+   └── Login
+
+📁 Exercises
+   ├── GET all
+   ├── POST create (ADMIN)
+   ├── PUT update (ADMIN)
+   └── DELETE (ADMIN)
+
+📁 Gyms
+   ├── GET all (PUBLIC)
+   ├── POST create
+   ├── PATCH approve (ADMIN)
+   └── DELETE (ADMIN)
+
+📁 Badges
+   ├── GET all (PUBLIC)
+   ├── POST create (ADMIN)
+   ├── PUT update (ADMIN)
+   ├── POST assign/:userId (ADMIN)
+   └── GET user/:userId
+
+📁 Rewards
+   ├── GET all (PUBLIC)
+   ├── POST create (ADMIN)
+   ├── POST claim/:rewardId (CUSTOMER)
+   ├── PATCH use/:userRewardId (CUSTOMER)
+   └── GET user/:userId
+
+📁 Challenges
+   ├── GET approved
+   ├── POST create
+   ├── POST :id/join
+   ├── POST :id/complete
+   ├── PATCH approve/:id (ADMIN)
+   └── DELETE :id
+
+📁 Users
+   ├── GET all (ADMIN)
+   ├── GET :id
+   └── PUT :id
+```
+
+### **Comptes de Test Disponibles**
+
+```
+ADMIN:    admin@fitness.com / admin123
+OWNER:    owner@fitnessgym.com / owner123
+CUSTOMER: jean.dupont@email.com / customer123
+          marie.martin@email.com / customer123
+          pierre.bernard@email.com / customer123
+```
 
 ---
 
