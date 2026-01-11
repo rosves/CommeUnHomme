@@ -8,7 +8,6 @@
  */
 
 import mongoose from "mongoose";
-import * as bcrypt from "bcrypt";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -25,21 +24,15 @@ import { ChallengeModel } from "./services/mongoose/schema/ChallengeSchema/chall
 import { UserRole } from "./models";
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const MONGODB_USER = process.env.MONGODB_USER || "root";
+const MONGODB_PASSWORD = process.env.MONGODB_PASSWORD || "dfbhjn1l4567";
 const DB_NAME = process.env.MONGODB_DATABASE || "fitness_db";
-
-interface SeedUser {
-  lastname: string;
-  firstname: string;
-  login: string;
-  password: string;
-  role: string;
-  weight: number;
-  birthdate: Date;
-}
 
 async function connectDB() {
   try {
-    await mongoose.connect(`${MONGODB_URI}/${DB_NAME}`);
+    const uri = `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@localhost:27017/${DB_NAME}?authSource=admin`;
+
+    await mongoose.connect(uri);
     console.log("✅ MongoDB connecté");
   } catch (error) {
     console.error("❌ Erreur connexion MongoDB:", error);
@@ -64,7 +57,7 @@ async function clearDB() {
 }
 
 async function seedUsers() {
-  const users: SeedUser[] = [
+  const users = [
     {
       lastname: "Admin",
       firstname: "Super",
@@ -127,14 +120,14 @@ async function seedExercises() {
     {
       name: "Course à Pied",
       description: "Cardio running en extérieur ou tapis",
-      muscleGroup: "Jambes",
+      muscleGroup: "Cardio",
       difficulty: "Débutant",
       calories: 500,
     },
     {
       name: "Développé Couché",
       description: "Musculation poitrine avec haltères ou barre",
-      muscleGroup: "Poitrine",
+      muscleGroup: "Pectoraux",
       difficulty: "Intermédiaire",
       calories: 300,
     },
@@ -162,21 +155,21 @@ async function seedExercises() {
     {
       name: "Burpees",
       description: "Cardio intensif combiné musculation",
-      muscleGroup: "Corps complet",
+      muscleGroup: "Cardio",
       difficulty: "Avancé",
       calories: 450,
     },
     {
       name: "Natation",
       description: "Endurance et cardio en piscine",
-      muscleGroup: "Corps complet",
+      muscleGroup: "Cardio",
       difficulty: "Intermédiaire",
       calories: 550,
     },
     {
       name: "Flexions (Push-ups)",
       description: "Musculation poitrine sans équipement",
-      muscleGroup: "Poitrine",
+      muscleGroup: "Pectoraux",
       difficulty: "Débutant",
       calories: 250,
     },
@@ -192,35 +185,65 @@ async function seedExercises() {
   }
 }
 
-async function seedGyms() {
+async function seedGyms(users: any[]) {
+  const owner = users.find((u) => u.role === UserRole.OWNER);
+
   const gyms = [
     {
       name: "FitPro Paris",
-      address: "123 Rue de Rivoli, 75001 Paris",
+      address: {
+        street: "123 Rue de Rivoli",
+        zipCode: "75001",
+        city: "Paris",
+        country: "France",
+      },
+      contact: {
+        phone: "01 23 45 67 89",
+        email: "contact@fitpro.fr",
+      },
       capacity: 200,
-      equipment: [
-        "Tapis de course",
-        "Haltères",
-        "Bancs de musculation",
-        "Piscine",
-      ],
+      installations: ["Cardio", "Musculation", "Stretching"],
+      equipment: ["Tapis de course", "Haltères", "Bancs de musculation"],
       description: "Salle de sport moderne au cœur de Paris",
+      ownerId: owner._id,
       isApproved: true,
     },
     {
       name: "Gym Villeneuve",
-      address: "456 Avenue des Champs, 92400 Villeneuve",
+      address: {
+        street: "456 Avenue des Champs",
+        zipCode: "92400",
+        city: "Villeneuve",
+        country: "France",
+      },
+      contact: {
+        phone: "01 98 76 54 32",
+        email: "info@villeneuve-gym.fr",
+      },
       capacity: 150,
-      equipment: ["Cardio", "Haltères", "CrossFit"],
+      installations: ["Cardio", "CrossFit"],
+      equipment: ["Tapis de course", "Haltères", "Kettlebells"],
       description: "Centre fitness complet avec cours collectifs",
+      ownerId: owner._id,
       isApproved: true,
     },
     {
       name: "Elite Fitness Club",
-      address: "789 Boulevard Saint-Michel, 75005 Paris",
+      address: {
+        street: "789 Boulevard Saint-Michel",
+        zipCode: "75005",
+        city: "Paris",
+        country: "France",
+      },
+      contact: {
+        phone: "01 55 66 77 88",
+        email: "hello@elite-fitness.com",
+      },
       capacity: 300,
+      installations: ["Premium", "Spa", "Sauna"],
       equipment: ["Tous les équipements", "Piscine", "Sauna", "Spa"],
       description: "Club premium avec services haut de gamme",
+      ownerId: owner._id,
       isApproved: false,
     },
   ];
@@ -235,7 +258,9 @@ async function seedGyms() {
   }
 }
 
-async function seedBadges() {
+async function seedBadges(users: any[]) {
+  const admin = users.find((u) => u.role === UserRole.ADMIN);
+
   const badges = [
     {
       name: "100 Points Master",
@@ -249,7 +274,7 @@ async function seedBadges() {
       },
       maxEarnings: 1,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "500 Points Champion",
@@ -263,7 +288,7 @@ async function seedBadges() {
       },
       maxEarnings: 1,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "5-Challenge Expert",
@@ -277,7 +302,7 @@ async function seedBadges() {
       },
       maxEarnings: 1,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "7-Day Warrior",
@@ -291,21 +316,21 @@ async function seedBadges() {
       },
       maxEarnings: 1,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "Difficulty Master",
-      description: "Maîtrisez la difficulté avancée",
+      description: "Complétez 3 défis niveau Avancé",
       rules: {
         single: {
           type: "difficulty_master",
-          operator: "égal",
-          value: "Avancé",
+          operator: "supérieur_ou_égal",
+          value: 3,
         },
       },
       maxEarnings: 1,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
   ];
 
@@ -319,7 +344,9 @@ async function seedBadges() {
   }
 }
 
-async function seedRewards() {
+async function seedRewards(users: any[]) {
+  const admin = users.find((u) => u.role === UserRole.ADMIN);
+
   const rewards = [
     {
       name: "Réduction 10% Abonnement",
@@ -330,11 +357,11 @@ async function seedRewards() {
         percentage: 10,
         code: "DISCOUNT10",
       },
-      validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 jours
+      validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
       maxClaims: 100,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "1h Coaching Session",
@@ -342,14 +369,14 @@ async function seedRewards() {
       pointsCost: 150,
       type: "coaching_session",
       details: {
-        duration: { value: 1, unit: "hours" },
+        duration: { value: 1, unit: "Mois" },
         code: "COACH-1H-001",
       },
-      validUntil: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000), // 180 jours
+      validUntil: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
       maxClaims: 50,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "1 Session Massage Gratuite",
@@ -358,14 +385,14 @@ async function seedRewards() {
       type: "free_session",
       details: {
         sessionType: "Massage",
-        duration: { value: 1, unit: "hours" },
+        duration: { value: 1, unit: "Jour" },
         code: "MASSAGE-001",
       },
-      validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 jours
+      validUntil: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
       maxClaims: 30,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "Pack Protéines Premium",
@@ -377,11 +404,11 @@ async function seedRewards() {
         quantity: 1,
         code: "PROTEIN-GOLD",
       },
-      validUntil: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000), // 120 jours
+      validUntil: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
       maxClaims: 25,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "1 Mois Abonnement Gratuit",
@@ -389,14 +416,14 @@ async function seedRewards() {
       pointsCost: 300,
       type: "gym_membership",
       details: {
-        duration: { value: 1, unit: "month" },
+        duration: { value: 1, unit: "Mois" },
         code: "FREE-MONTH-2026",
       },
-      validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 an
+      validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
       maxClaims: 20,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
     {
       name: "Plan Nutritionnel Personnalisé",
@@ -405,14 +432,14 @@ async function seedRewards() {
       type: "nutritional_plan",
       details: {
         consultationHours: 2,
-        planDuration: { value: 1, unit: "month" },
+      duration: { value: 1, unit: "Mois" },
         code: "NUTRITION-FULL",
       },
-      validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 jours
+      validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
       maxClaims: 15,
       claimedCount: 0,
       isActive: true,
-      createdBy: "admin_id",
+      createdBy: admin._id,
     },
   ];
 
@@ -438,78 +465,78 @@ async function seedChallenges(
     {
       name: "5km Daily Run",
       description: "Courez 5km quotidiennement pendant 7 jours",
-      difficulty: "facile",
-      duration: 7,
-      exercices: [exercises[0]._id],
-      gym: gym?._id,
+      difficulty: "Débutant",
+      duration: { value: 7, unit: "jour" },
+      exercises: [{ exerciseId: exercises[0]._id }],
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 50,
-      status: "approved",
+      points: 50,
+      status: "Actif",
       isApproved: true,
     },
     {
       name: "Push-Up Challenge",
       description: "Faites 100 push-ups répartis sur la semaine",
-      difficulty: "moyen",
-      duration: 7,
-      exercices: [exercises[7]._id],
-      gym: gym?._id,
+      difficulty: "Intermédiaire",
+      duration: { value: 7, unit: "jour" },
+      exercises: [{ exerciseId: exercises[7]._id }],
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 75,
-      status: "approved",
+      points: 75,
+      status: "Actif",
       isApproved: true,
     },
     {
       name: "Leg Day Warrior",
       description: "Entraînement intensif des jambes - 3 sessions",
-      difficulty: "difficile",
-      duration: 14,
-      exercices: [exercises[2]._id, exercises[0]._id],
-      gym: gym?._id,
+      difficulty: "Avancé",
+      duration: { value: 14, unit: "jour" },
+      exercises: [{ exerciseId: exercises[2]._id }, { exerciseId: exercises[0]._id }],
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 100,
-      status: "approved",
+      points: 100,
+      status: "Actif",
       isApproved: true,
     },
     {
       name: "Full Body Transformation",
       description: "Programme complet - cardio, musculation, flexibilité",
-      difficulty: "difficile",
-      duration: 30,
-      exercices: [
-        exercises[0]._id,
-        exercises[1]._id,
-        exercises[2]._id,
-        exercises[5]._id,
+      difficulty: "Avancé",
+      duration: { value: 30, unit: "jour" },
+      exercises: [
+        { exerciseId: exercises[0]._id },
+        { exerciseId: exercises[1]._id },
+        { exerciseId: exercises[2]._id },
+        { exerciseId: exercises[5]._id },
       ],
-      gym: gym?._id,
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 200,
-      status: "approved",
+      points: 200,
+      status: "Actif",
       isApproved: true,
     },
     {
       name: "Swimming Marathon",
       description: "Natation intense - 10 sessions d'1h minimum",
-      difficulty: "moyen",
-      duration: 21,
-      exercices: [exercises[6]._id],
-      gym: gym?._id,
+      difficulty: "Intermédiaire",
+      duration: { value: 3, unit: "semaine" },
+      exercises: [{ exerciseId: exercises[6]._id }],
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 120,
-      status: "approved",
+      points: 120,
+      status: "Actif",
       isApproved: true,
     },
     {
       name: "Deadlift Master",
       description: "Progressez en deadlift - technique et puissance",
-      difficulty: "difficile",
-      duration: 28,
-      exercices: [exercises[4]._id],
-      gym: gym?._id,
+      difficulty: "Avancé",
+      duration: { value: 4, unit: "semaine" },
+      exercises: [{ exerciseId: exercises[4]._id }],
+      gymId: gym?._id,
       createdBy: owner?._id,
-      pointsReward: 150,
-      status: "pending",
+      points: 150,
+      status: "Terminé",
       isApproved: false,
     },
   ];
@@ -534,12 +561,12 @@ async function main() {
     // Seed dans l'ordre correct
     const users = await seedUsers();
     const exercises = await seedExercises();
-    const gyms = await seedGyms();
-    const badges = await seedBadges();
-    const rewards = await seedRewards();
+    const gyms = await seedGyms(users);
+    const badges = await seedBadges(users);
+    const rewards = await seedRewards(users);
     const challenges = await seedChallenges(users, exercises, gyms);
 
-    console.log("\n✨ Seed terminé avec succès!");
+    console.log("\n✨ Data terminé avec succès!");
     console.log("\n📋 Données créées:");
     console.log(`   - Utilisateurs: ${users.length}`);
     console.log(`   - Exercices: ${exercises.length}`);
@@ -557,7 +584,7 @@ async function main() {
 
     process.exit(0);
   } catch (error) {
-    console.error("❌ Erreur durant le seed:", error);
+    console.error("❌ Erreur durant le data:", error);
     process.exit(1);
   }
 }
