@@ -16,7 +16,7 @@ const ChallengeSchema = new Schema<Challenge>(
       enum: Object.values(Difficulties),
       required: true,
     },
-    points: { type: Number, required: true },
+    points: { type: Number },
     equipment: [{ type: String, enum: Object.values(gymEquipements) }],
     exercises: [
       {
@@ -40,7 +40,7 @@ const ChallengeSchema = new Schema<Challenge>(
       value: { type: Number, required: true },
       unit: {
         type: String,
-        enum: ["jours", "semaines", "mois"],
+        enum: ["jour", "semaine", "mois"],
         required: true,
       },
     },
@@ -66,6 +66,9 @@ ChallengeSchema.pre("save", async function (next) {
     case Difficulties.ADVANCED:
       this.points = 70;
       break;
+  }
+  if (this.endAt && this.endAt.getTime() < Date.now()) {
+    this.status = StatusChallenge.ARCHIVED;
   }
   next();
 });

@@ -19,7 +19,7 @@ export enum Goal {
 }
 
 export interface Challenge {
-  _id?: Types.ObjectId;
+  _id?: string;
   name: string;
   description: string;
   difficulty: Difficulties;

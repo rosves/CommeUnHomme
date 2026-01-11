@@ -23,6 +23,15 @@ export class GymController {
     }
   }
 
+  async getMyGym(req: Request, res: Response) {
+    const userId = req?.user?.userId;
+    const gyms = await this.gymService.findByOwner(userId);
+    if (!gyms) {
+      res.status(400).send("Vous ne possédez pas de salle");
+    }
+    res.status(200).json(gyms);
+  }
+
   async changeInfo(req: Request, res: Response) {
     try {
       if (!req.params.id) {
@@ -161,6 +170,12 @@ export class GymController {
       authMiddleware,
       requireRole(UserRole.OWNER),
       this.changeInfo.bind(this)
+    );
+    router.get(
+      "/",
+      authMiddleware,
+      requireRole(UserRole.OWNER),
+      this.getMyGym.bind(this)
     );
 
     // Admin
