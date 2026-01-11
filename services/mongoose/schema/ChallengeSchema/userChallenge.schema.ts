@@ -8,7 +8,7 @@ const UserChallengeSchema = new Schema<UserChallenge>(
     completedAt: { type: Date },
     pointsEarned: { type: Number, required: true },
   },
-  { versionKey: false, collection: "challenges" }
+  { versionKey: false, collection: "userChallenges" }
 );
 
 export const UserChallengeModel =

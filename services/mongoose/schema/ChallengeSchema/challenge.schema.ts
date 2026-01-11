@@ -48,6 +48,7 @@ const ChallengeSchema = new Schema<Challenge>(
       type: String,
       enum: Object.values(StatusChallenge),
       required: true,
+      default: StatusChallenge.ACTIVE,
     },
     goals: { type: String, enum: Object.values(Goal) },
   },
@@ -66,7 +67,6 @@ ChallengeSchema.pre("save", async function (next) {
       this.points = 70;
       break;
   }
-  this.status = StatusChallenge.ACTIVE;
   next();
 });
 
