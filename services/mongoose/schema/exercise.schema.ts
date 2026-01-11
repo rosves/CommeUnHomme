@@ -15,6 +15,7 @@ const ExerciseSchema = new Schema<Exercise>(
       enum: ["Débutant", "Intermédiaire", "Avancé"],
       required: true,
     },
+    calories: { type: Number, required: true },
   },
   { versionKey: false }
 );

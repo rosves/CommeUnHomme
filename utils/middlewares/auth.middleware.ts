@@ -27,7 +27,6 @@ export function authMiddleware(
     }
 
     const parts = authHeader.split(" ");
-    console.log(parts);
 
     if (parts.length !== 2 || parts[0] !== "Bearer") {
       return res.status(401).json({

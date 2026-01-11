@@ -33,6 +33,7 @@ async function main() {
       password: process.env.ROOT_USER_PASSWORD as string,
       lastname: "Admin",
       firstname: "Admin",
+      score: 0,
     });
     console.log("Root admin created");
   }
