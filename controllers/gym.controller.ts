@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { GymService, UserService } from "../services/mongoose/services/";
 import { authMiddleware, requireRole } from "../utils/middlewares";
 import { UserRole } from "../models/user.interface";
+import { Gym } from "../models";
 
 export class GymController {
   constructor(
@@ -24,25 +25,48 @@ export class GymController {
 
   async changeInfo(req: Request, res: Response) {
     try {
-      const { user, gym } = req.body.user;
-
-      const User = this.userService.findUser(user);
-
-      if (!User) {
-        res.status(400).json({
-          message: "Erreur lors de la récupération de l'utilisateur",
-        });
+      if (!req.params.id) {
+        res.status(400).send("Veuillez précise l'id");
       }
 
-      const Gym = this.gymService.findByName(gym);
+      const Gym = await this.gymService.findById(req.params.id);
+      const Data: Record<string, any> = {};
+
+      for (const key in req.body) {
+        const value = req.body[key];
+
+        if (
+          // Pour checker si c'est un sous-object
+          typeof value === "object" &&
+          value !== null &&
+          !Array.isArray(value)
+        ) {
+          for (const subKey in value) {
+            Data[`${key}.${subKey}`] = value[subKey];
+          }
+        } else {
+          // champs simples
+          Data[key] = value;
+        }
+      }
 
       if (!Gym) {
-        res.status(400).json({
-          message: "Erreur lors de la récupération de la salle de sport",
-        });
+        res.status(400).send("La salle n'existe pas");
       }
 
-      res.status(200).send("Propriétaire ajouté");
+      const GymModified = await this.gymService.changeInformation(
+        req.params.id,
+        Data
+      );
+
+      if (!GymModified) {
+        res.status(400).send("Erreur de modification");
+      }
+
+      res.status(200).json({
+        message: "Les informations de la salle on été mis à jour", 
+        gym: GymModified,
+      });
     } catch (err) {
       res.status(400).json({
         message: "Erreur lors de l'ajout d'un propriétaire",
@@ -132,7 +156,7 @@ export class GymController {
     router.delete("/:id", authMiddleware, this.delete.bind(this));
 
     // Owner
-    router.post("/changeInfo", authMiddleware, this.changeInfo.bind(this));
+    router.post("/changeInfo/:id", authMiddleware, this.changeInfo.bind(this));
 
     // Admin
     router.get(

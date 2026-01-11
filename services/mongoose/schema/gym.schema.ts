@@ -55,7 +55,7 @@ const gymSchema = new Schema<Gym>(
         type: String,
       },
     ],
-    activities: [
+    exercises: [
       {
         type: String,
       },

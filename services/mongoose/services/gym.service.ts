@@ -21,8 +21,15 @@ export class GymService {
     });
   }
 
-  async changeInformation(ownerToAdd: User, gymName: Gym) {
-    console.log("a continuer");
+  async changeInformation(
+    gymId: string,
+    Data: Partial<Gym>
+  ): Promise<Gym | null> {
+    return this.gymModel.findByIdAndUpdate(
+      gymId,
+      { $set: Data },
+      { new: true, runValidators: true }
+    );
   }
 
   async approve(gymId: string): Promise<Gym | null> {
