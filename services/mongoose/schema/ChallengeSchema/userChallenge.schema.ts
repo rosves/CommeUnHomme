@@ -12,5 +12,5 @@ const UserChallengeSchema = new Schema<UserChallenge>(
 );
 
 export const UserChallengeModel =
-  mongoose.models.Challenge ||
-  mongoose.model<UserChallenge>("Challenge", UserChallengeSchema);
+  mongoose.models.UserChallenge ||
+  mongoose.model<UserChallenge>("UserChallenge", UserChallengeSchema);
