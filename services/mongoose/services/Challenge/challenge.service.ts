@@ -1,5 +1,7 @@
 import { Mongoose, Model } from "mongoose";
-import { Exercise, Challenge } from "../../../../models";
+import mongoose from "mongoose";
+import { Types } from "mongoose";
+import { Exercise, Challenge, StatusChallenge } from "../../../../models";
 import { ExerciseModel, ChallengeModel } from "../../schema";
 
 export class ChallengeService {
@@ -78,5 +80,43 @@ async approveChallenge(id: string): Promise<Challenge | null> {
     { new: true }
   );
 }
+
+  async getChallengeOwner(
+    id: Types.ObjectId | undefined
+  ): Promise<Challenge[] | null> {
+    return this.challengeModel.find({ gymId: id });
+  }
+
+  async getActiveChallengeOwner(
+    id: Types.ObjectId | undefined
+  ): Promise<Challenge[] | null> {
+    return this.challengeModel.find({
+      gymId: id,
+      status: StatusChallenge.ACTIVE,
+    });
+  }
+
+  async removeChallengeOwner(id: Types.ObjectId | undefined) {
+    return this.challengeModel.findOneAndDelete({
+      gymId: id,
+    });
+  }
+
+  async deleteChallengeOwner(id: string | undefined): Promise<boolean> {
+    const result = await this.challengeModel.findByIdAndDelete(id);
+    return !!result;
+  }
+
+  async getChallengeByIdOwner(id: string | undefined): Promise<Challenge | null> {
+    return this.challengeModel.findOne(new mongoose.Types.ObjectId(id));
+  }
+
+  async updateChallengeOwner(
+    id: string,
+    data: Partial<Challenge>
+  ): Promise<Challenge | null> {
+    return this.challengeModel.findByIdAndUpdate(id, data, { new: true });
+  }
 }
+
 
