@@ -1,4 +1,5 @@
 import { Difficulties } from "./challenge";
+import { Types } from "mongoose";
 
 export enum Muscle {
   CHEST = "Pectoraux",
@@ -11,7 +12,7 @@ export enum Muscle {
 }
 
 export interface Exercise {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: string;
   description: string;
   muscleGroup: Muscle;

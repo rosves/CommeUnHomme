@@ -19,14 +19,14 @@ export enum Goal {
 }
 
 export interface Challenge {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: string;
   description: string;
   difficulty: Difficulties;
-  points: number;
+  points?: number;
   equipment?: gymEquipements[];
   exercises?: {
-    exerciseId: string;
+    exerciseId: Types.ObjectId;
     sets?: number;
     reps?: number;
     duration?: number;
@@ -36,11 +36,11 @@ export interface Challenge {
   startAt?: Date;
   endAt?: Date;
   createdBy: Types.ObjectId;
-  isApproved: boolean;
+  isApproved?: boolean;
   duration: {
     value: number;
     unit: "jours" | "semaines" | "mois";
   };
-  status: StatusChallenge;
+  status?: StatusChallenge;
   goals?: Goal;
 }

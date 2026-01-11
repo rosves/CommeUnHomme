@@ -1,6 +1,6 @@
-import { Exercise } from "./";
+import { Types } from "mongoose";
 export interface Gym {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: string;
   address: {
     street: string;
@@ -16,9 +16,9 @@ export interface Gym {
   capacity: number;
   installations: string[];
   equipment: gymEquipements[];
-  exercises: Exercise[];
+  exercises: Types.ObjectId[];
   isApproved: boolean;
-  ownerId: string;
+  ownerId: Types.ObjectId;
 }
 
 export enum gymEquipements {

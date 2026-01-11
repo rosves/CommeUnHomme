@@ -57,7 +57,9 @@ const gymSchema = new Schema<Gym>(
     ],
     exercises: [
       {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Exercise",
+        required: true,
       },
     ],
     isApproved: {
@@ -65,7 +67,8 @@ const gymSchema = new Schema<Gym>(
       default: false,
     },
     ownerId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
   },

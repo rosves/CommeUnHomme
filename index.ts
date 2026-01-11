@@ -5,12 +5,14 @@ import {
   ExerciseController,
   UserController,
   AuthController,
+  ChallengeController,
 } from "./controllers";
 import { openMongooseConnection } from "./services";
 import {
   GymService,
   ExerciseService,
   UserService,
+  ChallengeService,
 } from "./services/mongoose/services";
 import { AuthService } from "./services/mongoose/services/Auth";
 import { config } from "dotenv";
@@ -24,6 +26,7 @@ async function main() {
   const gymService = new GymService(mongooseConnection);
   const exerciseService = new ExerciseService(mongooseConnection);
   const authService = new AuthService(userService);
+  const challengeService = new ChallengeService(mongooseConnection);
 
   const adminExists = await userService.findUser("admin");
   if (!adminExists) {
@@ -50,19 +53,23 @@ async function main() {
   const gymController = new GymController(gymService, userService);
   const exerciseController = new ExerciseController(exerciseService);
   const userController = new UserController(userService);
-
   const authController = new AuthController(authService);
+  const challengeController = new ChallengeController(
+    gymService,
+    userService,
+    challengeService
+  );
 
   app.use("/health-check", healthCheckController.buildRouter());
   app.use("/gym", gymController.buildRouter());
   app.use("/exercise", exerciseController.buildRouter());
   app.use("/user", userController.buildRouter());
   app.use("/auth", authController.buildRouter());
+  app.use("/owner", challengeController.buildRouter());
 
   app.listen(process.env.PORT || 3000, () =>
     console.log(`Server listening on port ${process.env.PORT || 3000}!`)
   );
 }
 
-// Lance l'API
 main().catch(console.error);

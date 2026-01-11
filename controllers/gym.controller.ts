@@ -64,7 +64,7 @@ export class GymController {
       }
 
       res.status(200).json({
-        message: "Les informations de la salle on été mis à jour", 
+        message: "Les informations de la salle on été mis à jour",
         gym: GymModified,
       });
     } catch (err) {
@@ -156,7 +156,12 @@ export class GymController {
     router.delete("/:id", authMiddleware, this.delete.bind(this));
 
     // Owner
-    router.post("/changeInfo/:id", authMiddleware, this.changeInfo.bind(this));
+    router.post(
+      "/changeInfo/:id",
+      authMiddleware,
+      requireRole(UserRole.OWNER),
+      this.changeInfo.bind(this)
+    );
 
     // Admin
     router.get(
