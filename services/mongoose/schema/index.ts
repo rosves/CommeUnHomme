@@ -1,3 +1,3 @@
-export * from './user.schema';
-export * from './gym.schema';
-export * from './exercise.schema';
+export { UserModel } from "./user.schema";
+export { ExerciseModel } from "./exercise.schema";
+export { GymModel } from "./gym.schema";
