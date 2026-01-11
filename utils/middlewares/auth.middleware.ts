@@ -10,13 +10,13 @@ declare global {
   }
 }
 
-const tokenService = new TokenService();
-
 export function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
+  const tokenService = new TokenService();
+
   try {
     const authHeader = req.headers.authorization;
 
