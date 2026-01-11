@@ -31,6 +31,7 @@ const UserSchema = new Schema<User>({
   },
   birthdate: {
     type: Date,
+    required: true,
   },
   score: {
     type: Number,

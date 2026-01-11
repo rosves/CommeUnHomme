@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 export enum UserRole {
   ADMIN = "ADMIN",
   OWNER = "OWNER",
@@ -5,7 +7,7 @@ export enum UserRole {
 }
 
 export interface User {
-  _id?: string;
+  _id?: Types.ObjectId;
   lastname: string;
   firstname: string;
   birthdate?: Date;
@@ -13,5 +15,5 @@ export interface User {
   role: UserRole;
   login: string;
   password: string;
-  score: number;
+  score?: number;
 }
