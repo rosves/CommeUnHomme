@@ -13,5 +13,5 @@ export interface User {
   role: UserRole;
   login: string;
   password: string;
-  score: number;
+  score?: number;
 }

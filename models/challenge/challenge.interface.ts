@@ -39,7 +39,7 @@ export interface Challenge {
   isApproved: boolean;
   duration: {
     value: number;
-    unit: "Jour" | "Semaine" | "Mois";
+    unit: "jours" | "semaines" | "mois";
   };
   status: StatusChallenge;
   goals?: Goal;
