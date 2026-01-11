@@ -453,46 +453,48 @@ export class ChallengeController {
     // Routes de partage
     router.get('/shared/with-me', authMiddleware, this.getSharedWithMe.bind(this));
 
-    // Routes avec ID de défi
     // Lecture
-    router.get('/:id', authMiddleware, this.getById.bind(this));
-
-    // Propriétaire/Administrateur uniquement
-    router.get(
-      "/challenge/:id",
-      authMiddleware,
-      requireRole(UserRole.OWNER),
-      this.getChallenges.bind(this)
-    );
-    router.get(
-      "/challenge/:gymId/:challengeId",
-      authMiddleware,
-      requireRole(UserRole.OWNER),
-      this.getChallengeOwner.bind(this)
-    );
-    // Actions utilisateur
-    router.post('/:id/join', authMiddleware, this.join.bind(this));
-    router.post('/:id/complete', authMiddleware, this.complete.bind(this));
-    router.delete('/:id/leave', authMiddleware, this.leave.bind(this));
-    router.post('/:id/share', authMiddleware, this.share.bind(this));
-
-    // Modification 
-    router.put('/:id', authMiddleware, requireRole(UserRole.OWNER), this.updateOwner.bind(this));
-    router.patch('/:id', authMiddleware, this.updateCustomer.bind(this));
-
-    router.delete('/:id', authMiddleware, this.delete.bind(this));
-
-    // Administration 
-    router.post('/', authMiddleware, this.create.bind(this));
-    //router.post('/gym/:gymId', authMiddleware, requireRole(UserRole.OWNER, UserRole.ADMIN), this.createForGym.bind(this));
-    router.patch('/approve/:id', authMiddleware, requireRole(UserRole.ADMIN, UserRole.OWNER), this.approve.bind(this));
-    router.get(
+     router.get(
       "/activeChallenge/:id",
       authMiddleware,
       requireRole(UserRole.OWNER),
       this.getActiveChallenge.bind(this)
     );
 
+    // Propriétaire/Administrateur uniquement
+    router.get(
+      "/owner/:id/challenges",
+      authMiddleware,
+      requireRole(UserRole.OWNER),
+      this.getChallenges.bind(this)
+    );
+
+    router.get(
+      "/owner/:gymId/challenges/:challengeId",
+      authMiddleware,
+      requireRole(UserRole.OWNER),
+      this.getChallengeOwner.bind(this)
+    );
+
+    router.patch('/approve/:id', authMiddleware, requireRole(UserRole.ADMIN, UserRole.OWNER), this.approve.bind(this));
+
+    // Routes avec ID
+    // Lecture
+    router.get('/:id', authMiddleware, this.getById.bind(this));
+   
+    // Actions utilisateur
+    router.post('/:id/join', authMiddleware, this.join.bind(this));
+    router.post('/:id/complete', authMiddleware, this.complete.bind(this));
+    router.delete('/:id/leave', authMiddleware, this.leave.bind(this));
+    router.post('/:id/share', authMiddleware, this.share.bind(this));
+
+    router.post('/', authMiddleware, this.create.bind(this));
+
+    // Modification 
+    router.put('/:id', authMiddleware, requireRole(UserRole.OWNER), this.updateOwner.bind(this));
+    router.patch('/:id', authMiddleware, this.updateCustomer.bind(this));
+
+    router.delete('/:id', authMiddleware, this.delete.bind(this));
 
     return router;
   }
