@@ -6,6 +6,8 @@ import {
   UserController,
   AuthController,
   ChallengeController,
+  BadgeController,
+  RewardController,
 } from "./controllers";
 import { openMongooseConnection } from "./services";
 import {
@@ -15,6 +17,8 @@ import {
   ChallengeService,
   UserChallengeService,
   SharedChallengeService,
+  BadgeService,
+  RewardService,
 } from "./services/mongoose/services";
 import { AuthService } from "./services/mongoose/services/Auth";
 import { config } from "dotenv";
@@ -65,6 +69,10 @@ async function main() {
     sharedChallengeService
   );
 
+  const badgeService = new BadgeService();
+  const rewardService = new RewardService();
+  const badgeController = new BadgeController(badgeService);
+  const rewardController = new RewardController(rewardService);
 
   app.use("/health-check", healthCheckController.buildRouter());
   app.use("/gym", gymController.buildRouter());
@@ -73,6 +81,8 @@ async function main() {
   app.use("/auth", authController.buildRouter());
   app.use("/owner", challengeController.buildRouter());
   app.use('/challenge', challengeController.buildRouter());
+  app.use("/badge", badgeController.buildRouter());
+  app.use("/reward", rewardController.buildRouter());
 
   app.listen(process.env.PORT || 3000, () =>
     console.log(`Server listening on port ${process.env.PORT || 3000}!`)

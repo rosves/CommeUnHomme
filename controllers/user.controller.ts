@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { UserService } from "../services/mongoose/services/user.service";
+import { authMiddleware, requireRole } from "../utils/middlewares";
+import { UserRole } from "../models";
 import * as bcrypt from 'bcrypt';
 
 export class UserController {
@@ -88,12 +90,15 @@ export class UserController {
 
     buildRouter(): Router {
         const router = Router();
-        router.post('/', this.create.bind(this));      
-        router.post('/login', this.login.bind(this)); 
-        router.get('/all', this.getAll.bind(this));  
-        router.get('/:id', this.getById.bind(this));  
-        router.put('/:id', this.update.bind(this));    
-        router.delete('/:id', this.delete.bind(this)); 
+        
+        router.post('/register', this.create.bind(this));      
+        router.post('/login', this.login.bind(this));
+        
+        router.get('/all', authMiddleware, requireRole(UserRole.ADMIN), this.getAll.bind(this));  
+        router.get('/:id', authMiddleware, this.getById.bind(this));  
+        router.put('/:id', authMiddleware, this.update.bind(this));    
+        router.delete('/:id', authMiddleware, requireRole(UserRole.ADMIN), this.delete.bind(this));
+        
         return router;
     }
 }

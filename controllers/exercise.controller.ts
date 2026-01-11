@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { ExerciseService } from "../services/mongoose/services/exercise.service";
+import { authMiddleware, requireRole } from "../utils/middlewares";
+import { UserRole } from "../models";
 
 export class ExerciseController {
     constructor(private exerciseService: ExerciseService) {}
@@ -35,11 +37,14 @@ export class ExerciseController {
 
     buildRouter(): Router {
         const router = Router();
-        router.post('/', this.create.bind(this));      
+        
         router.get('/all', this.getAll.bind(this)); 
         router.get('/:id', this.getAll.bind(this)); 
-        router.put('/:id', this.update.bind(this));    
-        router.delete('/:id', this.delete.bind(this)); 
+        
+        router.post('/', authMiddleware, requireRole(UserRole.ADMIN), this.create.bind(this));      
+        router.put('/:id', authMiddleware, requireRole(UserRole.ADMIN), this.update.bind(this));    
+        router.delete('/:id', authMiddleware, requireRole(UserRole.ADMIN), this.delete.bind(this));
+        
         return router;
     }
 }
