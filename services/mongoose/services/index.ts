@@ -7,3 +7,4 @@ export * from "./Auth/auth.service";
 export * from "./Challenge/sharedchallenge.service";
 export * from './badge.service';
 export * from './reward.service';
+export * from './leaderboard.service';

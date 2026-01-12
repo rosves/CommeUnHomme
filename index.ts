@@ -8,6 +8,7 @@ import {
   ChallengeController,
   BadgeController,
   RewardController,
+  LeaderboardController,
 } from "./controllers";
 import { openMongooseConnection } from "./services";
 import {
@@ -19,6 +20,7 @@ import {
   SharedChallengeService,
   BadgeService,
   RewardService,
+  LeaderboardService,
 } from "./services/mongoose/services";
 import { AuthService } from "./services/mongoose/services/Auth";
 import { config } from "dotenv";
@@ -36,18 +38,6 @@ async function main() {
   const userChallengeService = new UserChallengeService(mongooseConnection);
   const sharedChallengeService = new SharedChallengeService(mongooseConnection);
 
-  const adminExists = await userService.findUser("admin");
-  if (!adminExists) {
-    await userService.createUser({
-      role: UserRole.ADMIN,
-      login: "admin",
-      password: process.env.ROOT_USER_PASSWORD as string,
-      lastname: "Admin",
-      firstname: "Admin",
-      score: 0,
-    });
-    console.log("Root admin created");
-  }
 
   const app = express();
   app.use(express.json()); // pour la compréhension de postman
@@ -71,8 +61,10 @@ async function main() {
 
   const badgeService = new BadgeService();
   const rewardService = new RewardService();
+  const leaderboardService = new LeaderboardService(mongooseConnection);
   const badgeController = new BadgeController(badgeService);
   const rewardController = new RewardController(rewardService);
+  const leaderboardController = new LeaderboardController(leaderboardService);
 
   app.use("/health-check", healthCheckController.buildRouter());
   app.use("/gym", gymController.buildRouter());
@@ -83,6 +75,7 @@ async function main() {
   app.use('/challenge', challengeController.buildRouter());
   app.use("/badge", badgeController.buildRouter());
   app.use("/reward", rewardController.buildRouter());
+  app.use("/leaderboard", leaderboardController.buildRouter());
 
   app.listen(process.env.PORT || 3000, () =>
     console.log(`Server listening on port ${process.env.PORT || 3000}!`)

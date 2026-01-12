@@ -6,3 +6,4 @@ export * from './auth.controller';
 export * from './badge.controller';
 export * from './reward.controller';
 export * from './challenge.controller';
+export * from './leaderboard.controller';

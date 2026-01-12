@@ -19,6 +19,7 @@ import { GymModel } from "./services/mongoose/schema/gym.schema";
 import { BadgeModel } from "./services/mongoose/schema/badge.schema";
 import { RewardModel } from "./services/mongoose/schema/reward.schema";
 import { ChallengeModel } from "./services/mongoose/schema/ChallengeSchema/challenge.schema";
+import { UserChallengeModel } from "./services/mongoose/schema/ChallengeSchema/userChallenge.schema";
 
 // Types
 import { UserRole } from "./models";
@@ -102,6 +103,24 @@ async function seedUsers() {
       role: UserRole.CUSTOMER,
       weight: 90,
       birthdate: new Date("1988-11-30"),
+    },
+    {
+      lastname: "Laurent",
+      firstname: "Sophie",
+      login: "sophie.laurent@email.com",
+      password: "customer123",
+      role: UserRole.CUSTOMER,
+      weight: 70,
+      birthdate: new Date("1992-02-14"),
+    },
+    {
+      lastname: "Moreau",
+      firstname: "Thomas",
+      login: "thomas.moreau@email.com",
+      password: "customer123",
+      role: UserRole.CUSTOMER,
+      weight: 82,
+      birthdate: new Date("1991-08-22"),
     },
   ];
 
@@ -551,6 +570,43 @@ async function seedChallenges(
   }
 }
 
+async function seedUserChallenges(
+  users: any[],
+  challenges: any[]
+) {
+  const customers = users.filter((u) => u.role === UserRole.CUSTOMER);
+  const userChallenges = [];
+
+  // Créer des participations variées pour avoir un bon leaderboard
+  for (let i = 0; i < customers.length; i++) {
+    const customer = customers[i];
+    const numChallenges = Math.floor(Math.random() * 4) + 2; // 2-5 défis par user
+
+    for (let j = 0; j < numChallenges; j++) {
+      const challenge = challenges[j % challenges.length];
+      const isCompleted = Math.random() > 0.3; // 70% de complétion
+
+      userChallenges.push({
+        userId: customer._id,
+        challengeId: challenge._id,
+        pointsEarned: isCompleted ? challenge.points : 0,
+        completedAt: isCompleted
+          ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000)
+          : undefined,
+      });
+    }
+  }
+
+  try {
+    const created = await UserChallengeModel.insertMany(userChallenges);
+    console.log(`✅ ${created.length} participations aux défis créées`);
+    return created;
+  } catch (error) {
+    console.error("❌ Erreur création participations:", error);
+    return [];
+  }
+}
+
 async function main() {
   console.log("🌱 Démarrage du seed...\n");
 
@@ -565,6 +621,7 @@ async function main() {
     const badges = await seedBadges(users);
     const rewards = await seedRewards(users);
     const challenges = await seedChallenges(users, exercises, gyms);
+    const userChallenges = await seedUserChallenges(users, challenges);
 
     console.log("\n✨ Data terminé avec succès!");
     console.log("\n📋 Données créées:");
@@ -574,6 +631,7 @@ async function main() {
     console.log(`   - Badges: ${badges.length}`);
     console.log(`   - Récompenses: ${rewards.length}`);
     console.log(`   - Défis: ${challenges.length}`);
+    console.log(`   - Participations: ${userChallenges.length}`);
 
     console.log("\n🔑 Comptes de Test:");
     console.log("   ADMIN:    admin@fitness.com / admin123");
@@ -581,6 +639,8 @@ async function main() {
     console.log("   CUSTOMER: jean.dupont@email.com / customer123");
     console.log("   CUSTOMER: marie.martin@email.com / customer123");
     console.log("   CUSTOMER: pierre.bernard@email.com / customer123");
+    console.log("   CUSTOMER: sophie.laurent@email.com / customer123");
+    console.log("   CUSTOMER: thomas.moreau@email.com / customer123");
 
     process.exit(0);
   } catch (error) {

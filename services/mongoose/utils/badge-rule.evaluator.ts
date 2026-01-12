@@ -1,12 +1,6 @@
 import { BadgeRule, RuleType } from "../../../models/badge";
 
-/**
- * Service pour évaluer les règles de badges
- */
 export class BadgeRuleEvaluator {
-  /**
-   * Évalue une seule règle
-   */
   static evaluateRule(rule: BadgeRule, userValue: number): boolean {
     const { operator, value } = rule;
 
@@ -26,9 +20,6 @@ export class BadgeRuleEvaluator {
     }
   }
 
-  /**
-   * Évalue les conditions d'attribution d'un badge
-   */
   static evaluateConditions(
     rules: BadgeRule[],
     userValues: { [key in RuleType]: number },
@@ -41,16 +32,12 @@ export class BadgeRuleEvaluator {
     }
   }
 
-  /**
-   * Collecte les valeurs utilisateur pour chaque type de règle
-   */
   static async collectUserMetrics(
     userId: string,
     models: any
   ): Promise<{ [key in RuleType]: number }> {
     const { UserChallengeModel } = models;
 
-    // Récupérer les défis complétés de l'utilisateur
     const completedChallenges = await UserChallengeModel.find({
       userId,
       isCompleted: true,
@@ -73,9 +60,6 @@ export class BadgeRuleEvaluator {
     return metrics;
   }
 
-  /**
-   * Calcule le nombre de jours consécutifs
-   */
   private static async calculateStreakDays(userId: string, models: any): Promise<number> {
     const { UserChallengeModel } = models;
 
