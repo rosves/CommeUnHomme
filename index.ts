@@ -36,19 +36,6 @@ async function main() {
   const userChallengeService = new UserChallengeService(mongooseConnection);
   const sharedChallengeService = new SharedChallengeService(mongooseConnection);
 
-  const adminExists = await userService.findUser("admin");
-  if (!adminExists) {
-    await userService.createUser({
-      role: UserRole.ADMIN,
-      login: "admin",
-      password: process.env.ROOT_USER_PASSWORD as string,
-      lastname: "Admin",
-      firstname: "Admin",
-      score: 0,
-    });
-    console.log("Root admin created");
-  }
-
   const app = express();
   app.use(express.json()); // pour la compréhension de postman
 
@@ -80,7 +67,7 @@ async function main() {
   app.use("/user", userController.buildRouter());
   app.use("/auth", authController.buildRouter());
   app.use("/owner", challengeController.buildRouter());
-  app.use('/challenge', challengeController.buildRouter());
+  app.use("/challenge", challengeController.buildRouter());
   app.use("/badge", badgeController.buildRouter());
   app.use("/reward", rewardController.buildRouter());
 

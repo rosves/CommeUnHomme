@@ -1,6 +1,6 @@
 /**
  * Script de Population - Initialise la base de données avec des données de test
- * 
+ *
  * Usage:
  * npm run data
  * ou
@@ -9,6 +9,7 @@
 
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -62,7 +63,7 @@ async function seedUsers() {
       lastname: "Admin",
       firstname: "Super",
       login: "admin@fitness.com",
-      password: "admin123",
+      password: await bcrypt.hash("admin123", 10),
       role: UserRole.ADMIN,
       weight: 75,
       birthdate: new Date("1990-01-15"),
@@ -71,7 +72,7 @@ async function seedUsers() {
       lastname: "Owner",
       firstname: "Gym",
       login: "owner@fitnessgym.com",
-      password: "owner123",
+      password: await bcrypt.hash("owner123", 10),
       role: UserRole.OWNER,
       weight: 80,
       birthdate: new Date("1985-05-20"),
@@ -80,7 +81,7 @@ async function seedUsers() {
       lastname: "Dupont",
       firstname: "Jean",
       login: "jean.dupont@email.com",
-      password: "customer123",
+      password: await bcrypt.hash("customer123", 10),
       role: UserRole.CUSTOMER,
       weight: 85,
       birthdate: new Date("1995-03-10"),
@@ -89,7 +90,7 @@ async function seedUsers() {
       lastname: "Martin",
       firstname: "Marie",
       login: "marie.martin@email.com",
-      password: "customer123",
+      password: await bcrypt.hash("customer123", 10),
       role: UserRole.CUSTOMER,
       weight: 65,
       birthdate: new Date("2000-07-25"),
@@ -98,7 +99,7 @@ async function seedUsers() {
       lastname: "Bernard",
       firstname: "Pierre",
       login: "pierre.bernard@email.com",
-      password: "customer123",
+      password: await bcrypt.hash("customer123", 10),
       role: UserRole.CUSTOMER,
       weight: 90,
       birthdate: new Date("1988-11-30"),
@@ -108,6 +109,7 @@ async function seedUsers() {
   try {
     const createdUsers = await UserModel.insertMany(users);
     console.log(`✅ ${createdUsers.length} utilisateurs créés`);
+    console.log(createdUsers);
     return createdUsers;
   } catch (error) {
     console.error("❌ Erreur création utilisateurs:", error);
@@ -432,7 +434,7 @@ async function seedRewards(users: any[]) {
       type: "nutritional_plan",
       details: {
         consultationHours: 2,
-      duration: { value: 1, unit: "Mois" },
+        duration: { value: 1, unit: "Mois" },
         code: "NUTRITION-FULL",
       },
       validUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
@@ -453,11 +455,7 @@ async function seedRewards(users: any[]) {
   }
 }
 
-async function seedChallenges(
-  users: any[],
-  exercises: any[],
-  gyms: any[]
-) {
+async function seedChallenges(users: any[], exercises: any[], gyms: any[]) {
   const owner = users.find((u) => u.role === UserRole.OWNER);
   const gym = gyms[0];
 
@@ -491,7 +489,10 @@ async function seedChallenges(
       description: "Entraînement intensif des jambes - 3 sessions",
       difficulty: "Avancé",
       duration: { value: 14, unit: "jour" },
-      exercises: [{ exerciseId: exercises[2]._id }, { exerciseId: exercises[0]._id }],
+      exercises: [
+        { exerciseId: exercises[2]._id },
+        { exerciseId: exercises[0]._id },
+      ],
       gymId: gym?._id,
       createdBy: owner?._id,
       points: 100,
