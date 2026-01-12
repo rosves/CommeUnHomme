@@ -1,6 +1,8 @@
 # 🏋️ FITNESS - Plateforme de Gamification d'Entraînement
 
-API REST pour une application de fitness avec système de badges et récompenses dynamiques.
+API REST pour une application de fitness.
+
+### 🔗 **[Accéder à la Collection Postman](https://app.getpostman.com/join-team?invite_code=8882fcb795990e3f8701cc0a47a98abe540c34a1ae15fede9d4579de42f45e78&target_code=93542dcbb232020c4383103a29a5f036)**
 
 ---
 
@@ -219,6 +221,37 @@ L'API supporte 3 rôles utilisateur avec permissions granulaires :
 | `GET` | `/reward/user/:userId` | Ses récompenses réclamées | ✅ AUTHENTIFIÉ |
 | `GET` | `/reward/user/:userId/unclaimed` | Récompenses non utilisées | ✅ AUTHENTIFIÉ |
 | `PATCH` | `/reward/use/:userRewardId` | Utiliser/activer une récompense | ✅ AUTHENTIFIÉ |
+
+---
+
+### **Classements & Leaderboards**
+
+**Justification** : Système de compétition sain - afficher les meilleurs utilisateurs par points, défis complétés ou activité globale crée une dynamique communautaire motivante. Les users voient leur position et sont poussés à progresser.
+
+#### **Leaderboards Publics** (Classements Globaux)
+
+| Méthode | Endpoint | Description | Auth |
+|---------|----------|-------------|------|
+| `GET` | `/leaderboard/top-points?` | Top utilisateurs par points accumulés | ❌ PUBLIC |
+| `GET` | `/leaderboard/top-challenges?` | Top utilisateurs par défis complétés | ❌ PUBLIC |
+| `GET` | `/leaderboard/most-active?` | Top utilisateurs les plus actifs (participation + completion rate + badges) | ❌ PUBLIC |
+
+
+
+**Réponse Leaderboard (Exemple)** :
+```json
+{
+  "rank": 2,
+  "userId": "507f1f77bcf86cd799439011",
+  "firstname": "Jean",
+  "lastname": "Dupont",
+  "login": "jean.dupont@email.com",
+  "totalPoints": 450,
+  "completedChallenges": 8,
+  "completionRate": 0.80,
+  "badgesEarned": 3
+}
+```
 
 ---
 
