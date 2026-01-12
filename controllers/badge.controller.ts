@@ -6,9 +6,6 @@ import { Badge, UserRole } from "../models";
 export class BadgeController {
   constructor(private badgeService: BadgeService) {}
 
-  /**
-   * Créer un badge avec règles dynamiques
-   */
   async create(req: Request, res: Response) {
     try {
       const { name, description, rules, maxEarnings } = req.body;

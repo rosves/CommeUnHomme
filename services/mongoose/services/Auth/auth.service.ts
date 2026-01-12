@@ -58,7 +58,7 @@ export class AuthService {
     if (!user) {
       throw new Error("l'utilisateur n'existe pas");
     }
-
+    console.log(user.password);
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       throw new Error("Identifiants invalides");

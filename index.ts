@@ -72,7 +72,7 @@ async function main() {
   app.use("/user", userController.buildRouter());
   app.use("/auth", authController.buildRouter());
   app.use("/owner", challengeController.buildRouter());
-  app.use('/challenge', challengeController.buildRouter());
+  app.use("/challenge", challengeController.buildRouter());
   app.use("/badge", badgeController.buildRouter());
   app.use("/reward", rewardController.buildRouter());
   app.use("/leaderboard", leaderboardController.buildRouter());

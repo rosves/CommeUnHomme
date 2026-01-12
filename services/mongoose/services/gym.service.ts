@@ -52,8 +52,8 @@ export class GymService {
     return this.gymModel.findOne({ name: gymName });
   }
 
-  async findByOwner(ownerId: string | undefined): Promise<Gym[] | null> {
-    return this.gymModel.find({ ownerId: ownerId });
+  async findByOwner(id: string | undefined): Promise<Gym[] | null> {
+    return this.gymModel.find({ ownerId: id });
   }
 
   async findById(id: string): Promise<Gym | null> {
